@@ -11,8 +11,8 @@
 window.SITE_DATA = {
 
   // ---------- 基本信息 ----------
-  name: "你的名字",              // 显示在标题、Hero 大字、页脚
-  logoText: "portfolio",         // 左上角 Logo 显示 ~/xxx
+  name: "徐潘磊",              // 显示在标题、Hero 大字、页脚
+  logoText: "Ltmouse8552",         // 左上角 Logo 显示 ~/xxx
   heroHello: "你好,世界",        // Hero 顶部小字 ● 后面的问候语
   tagline: "上海杉达学院 · 计算机科学与技术(卓越班)",  // 名字下方一句话
   version: "1.0.0",              // 底部状态栏版本号
@@ -22,7 +22,7 @@ window.SITE_DATA = {
   //       "out" = 输出行(text 纯文本 / html 可带高亮标签)
   terminal: [
     { type: "cmd", text: "whoami" },
-    { type: "out", text: "上海杉达学院 · 计算机科学与技术 · 卓越班在读" },
+    { type: "out", text: "上海杉达学院 · 计算机科学与技术 · 卓越班" },
     { type: "out", text: "热爱编程,乐于把想法变成能运行的东西。" },
     { type: "cmd", text: "cat ./interests.txt" },
     { type: "out", html: '<span class="hl-c">[</span> 后端开发, 算法, 开源 <span class="hl-c">]</span>' },
@@ -32,14 +32,14 @@ window.SITE_DATA = {
 
   // 联系方式(邮箱会自动显示为 Contact 区的大号邮箱)
   contacts: [
-    { label: "邮箱", text: "your_email@example.com" },
-    { label: "GitHub", text: "https://github.com/你的用户名" },
+    { label: "邮箱", text: "2143063768@qq.com" },
+    { label: "GitHub", text: "https://github.com/LtMouse8552" },
     // { label: "博客", text: "https://..." },
   ],
 
   // ---------- 关于我(Bento Grid) ----------
   about: {
-    name: "你的名字",
+    name: "徐潘磊",
     school: "上海杉达学院",
     major: "计算机科学与技术(卓越班)",
     role: "学生开发者",
@@ -95,16 +95,16 @@ window.SITE_DATA = {
     {
       tag: "feat",
       hash: "a1b2c3d",
-      time: "20XX 年 9 月 — 至今",
+      time: "2025 年 9 月 — ",
       title: "上海杉达学院 · 计算机科学与技术(卓越班)",
-      description: "在这里填写学习情况、绩点排名、主要课程、奖学金等。",
+      description: "像一个人类",
     },
     {
       tag: "merge",
       hash: "e4f5g6h",
-      time: "20XX 年 X 月",
-      title: "某段竞赛 / 实习 / 项目经历(示例,请替换)",
-      description: "具体描述这段经历的职责与成果。",
+      time: "20XX 年",
+      title: "不知道",
+      description: "也不知道",
     },
   ],
 
