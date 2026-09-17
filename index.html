@@ -3,213 +3,997 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>个人展示平台</title>
+  <meta name="description" content="上海杉达学院计算机科学与技术专业卓越班学生 — 个人作品与项目展示">
+  <title>你的名字 — 个人主页</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
   <style>
+    /* ==========================================================
+       主题变量 — 深色默认(IDE Dark),html.light 切换浅色主题
+       ========================================================== */
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent2: #818cf8;
-      --border: #334155;
+      --bg: #0A0A0F;
+      --bg-panel: #12121A;
+      --bg-panel-glass: rgba(18, 18, 26, .72);
+      --bg-inset: #0D0D14;
+      --border: #1F1F2E;
+      --border-strong: #2C2C40;
+
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-faint: #5A6478;
+
+      --violet: #7C3AED;
+      --cyan: #22D3EE;
+      --lime: #A3E635;
+      --pink: #F472B6;
+      --amber: #FBBF24;
+
+      /* 语法高亮 */
+      --syn-keyword: #A78BFA;
+      --syn-string: #A3E635;
+      --syn-func: #22D3EE;
+      --syn-comment: #5A6478;
+      --syn-number: #FBBF24;
+
+      --glow-violet: rgba(124, 58, 237, .16);
+      --glow-cyan: rgba(34, 211, 238, .12);
+
+      --font-display: "Space Grotesk", "Inter", sans-serif;
+      --font-body: "Inter", "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+
+      --radius: 12px;
+      --noise-opacity: .05;
     }
+
+    html.light {
+      --bg: #FAFAFc;
+      --bg-panel: #FFFFFF;
+      --bg-panel-glass: rgba(255, 255, 255, .8);
+      --bg-inset: #F1F0F7;
+      --border: #E4E2EF;
+      --border-strong: #CDCBE0;
+      --text: #17151F;
+      --text-muted: #5B5E72;
+      --text-faint: #9CA0B5;
+      --violet: #6D28D9;
+      --cyan: #0891B2;
+      --lime: #65A30D;
+      --syn-keyword: #7C3AED;
+      --syn-string: #4D7C0F;
+      --syn-func: #0E7490;
+      --syn-comment: #9CA0B5;
+      --syn-number: #B45309;
+      --glow-violet: rgba(124, 58, 237, .08);
+      --glow-cyan: rgba(8, 145, 178, .07);
+      --noise-opacity: .03;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
-      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      font-family: var(--font-body);
       background: var(--bg);
       color: var(--text);
-      line-height: 1.7;
+      line-height: 1.75;
+      overflow-x: hidden;
+      transition: background .4s, color .4s;
     }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--violet); color: #fff; }
 
-    /* 导航 */
-    nav {
-      position: sticky; top: 0; z-index: 10;
-      background: rgba(15, 23, 42, .9);
-      backdrop-filter: blur(8px);
+    /* ---------- 背景层:细网格 + 漂浮光晕 + 噪点 ---------- */
+    .bg-layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .bg-grid {
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 56px 56px;
+      opacity: .35;
+      mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 100%);
+    }
+    .bg-orb { position: absolute; border-radius: 50%; filter: blur(90px); will-change: transform; }
+    .orb-1 { width: 520px; height: 520px; background: var(--glow-violet); top: -140px; left: -100px; animation: drift 22s ease-in-out infinite alternate; }
+    .orb-2 { width: 420px; height: 420px; background: var(--glow-cyan); top: 30%; right: -140px; animation: drift 28s ease-in-out infinite alternate-reverse; }
+    @keyframes drift { from { transform: translate(0, 0); } to { transform: translate(70px, 50px); } }
+    .bg-noise { opacity: var(--noise-opacity); }
+
+    /* ---------- 顶部 IDE 菜单栏 + 文件标签 ---------- */
+    .ide-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      background: var(--bg-panel-glass);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
     }
-    nav .container { display: flex; align-items: center; justify-content: space-between; height: 56px; }
-    nav .logo { font-weight: 700; color: var(--text); }
-    nav .links a { color: var(--muted); margin-left: 20px; font-size: 15px; }
-    nav .links a:hover { color: var(--accent); text-decoration: none; }
-
-    /* Hero */
-    header.hero { padding: 80px 0 60px; text-align: center; }
-    .avatar {
-      width: 110px; height: 110px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: 44px; font-weight: 700; color: #fff; margin-bottom: 20px;
+    .menubar {
+      display: flex; align-items: center; gap: 8px;
+      max-width: 1160px; margin: 0 auto; padding: 0 24px; height: 46px;
     }
-    .hero h1 { font-size: 34px; margin-bottom: 8px; }
-    .hero .tagline { color: var(--muted); font-size: 18px; margin-bottom: 6px; }
-    .hero .school { color: var(--accent); font-size: 15px; }
-    .contact { margin-top: 18px; font-size: 14px; color: var(--muted); }
-    .contact span { margin: 0 10px; }
-
-    /* 通用区块 */
-    section { padding: 48px 0; }
-    section h2 {
-      font-size: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+    .logo {
+      font-family: var(--font-mono); font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; gap: 8px; margin-right: 12px;
     }
-    section h2::after {
-      content: ""; flex: 1; height: 1px; background: var(--border);
+    .logo .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); }
+    .menu-item { font-size: 12.5px; color: var(--text-faint); padding: 3px 8px; border-radius: 6px; cursor: default; }
+    .menubar .spacer { flex: 1; }
+
+    .theme-toggle {
+      font-family: var(--font-mono); font-size: 12px;
+      color: var(--text-muted); background: var(--bg-inset);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 5px 12px; cursor: pointer; transition: all .2s;
+    }
+    .theme-toggle:hover { border-color: var(--violet); color: var(--text); }
+
+    .tabs {
+      display: flex; gap: 2px; max-width: 1160px; margin: 0 auto; padding: 0 24px;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      font-family: var(--font-mono); font-size: 13px;
+      color: var(--text-muted); padding: 8px 16px;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap; transition: color .2s, border-color .2s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); border-bottom-color: var(--violet); }
+    .tab .ext { color: var(--text-faint); font-size: 11px; }
+    .tab.active .ext { color: var(--violet); }
+
+    .run-btn {
+      margin-left: auto; align-self: center;
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+      color: #fff; background: linear-gradient(135deg, var(--violet), var(--cyan));
+      padding: 6px 16px; border-radius: 8px; border: none; cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .run-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--glow-violet); }
+
+    /* ---------- 通用布局 ---------- */
+    main { position: relative; z-index: 1; padding-top: 96px; }
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 96px 0 32px; }
+    .section-head {
+      display: flex; align-items: baseline; gap: 16px; margin-bottom: 40px;
+    }
+    .section-head .idx {
+      font-family: var(--font-mono); font-size: 13px; color: var(--violet);
+      border: 1px solid var(--violet); border-radius: 6px; padding: 2px 10px;
+    }
+    .section-head h2 {
+      font-family: var(--font-display); font-size: clamp(30px, 4.5vw, 44px);
+      font-weight: 700; letter-spacing: -.02em; line-height: 1.15;
+    }
+    .section-head .file {
+      font-family: var(--font-mono); font-size: 13px; color: var(--text-faint); margin-left: auto;
     }
 
-    /* 关于我 */
-    .about-text { color: var(--muted); white-space: pre-line; }
+    /* 渐变流动文字 */
+    .grad-text {
+      background: linear-gradient(90deg, var(--violet), var(--cyan), var(--lime), var(--violet));
+      background-size: 300% 100%;
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: gradflow 8s linear infinite;
+    }
+    @keyframes gradflow { to { background-position: 300% 0; } }
 
-    /* 技能 */
-    .skill-group { margin-bottom: 18px; }
-    .skill-group h3 { font-size: 16px; margin-bottom: 10px; color: var(--text); }
-    .tags { display: flex; flex-wrap: wrap; gap: 10px; }
-    .tag {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 999px; padding: 5px 14px; font-size: 14px; color: var(--text);
+    /* ---------- 卡片基础 + 玻璃拟态 + 3D tilt ---------- */
+    .card {
+      background: var(--bg-panel-glass);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      transition: border-color .25s, transform .15s ease-out, box-shadow .25s;
+      will-change: transform;
+    }
+    .card:hover { border-color: var(--border-strong); box-shadow: 0 12px 40px rgba(0,0,0,.35); }
+    html.light .card:hover { box-shadow: 0 12px 40px rgba(23, 21, 31, .08); }
+
+    /* ---------- 滚动渐入 ---------- */
+    .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ---------- 终端窗口 ---------- */
+    .term {
+      background: var(--bg-inset); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,.45);
+      position: relative;
+    }
+    html.light .term { box-shadow: 0 24px 60px rgba(23,21,31,.1); }
+    .term-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
+    }
+    .term-bar .b { width: 11px; height: 11px; border-radius: 50%; }
+    .b-r { background: #FF5F57; } .b-y { background: #FEBC2E; } .b-g { background: #28C840; }
+    .term-bar .title { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); margin: 0 auto; }
+    .term-body {
+      font-family: var(--font-mono); font-size: 14px; line-height: 2;
+      padding: 22px 24px; min-height: 240px; position: relative;
+    }
+    /* 扫描线 */
+    .term-body::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.015) 3px 4px);
+    }
+    html.light .term-body::after { background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,.02) 3px 4px); }
+    .term-line .prompt { color: var(--lime); font-weight: 700; }
+    .term-line .cmd { color: var(--text); }
+    .term-line .out { color: var(--text-muted); }
+    .term-line .hl-v { color: var(--syn-keyword); }
+    .term-line .hl-c { color: var(--syn-func); }
+    .term-line .hl-s { color: var(--syn-string); }
+    .caret {
+      display: inline-block; width: 9px; height: 1.15em;
+      background: var(--lime); vertical-align: text-bottom; margin-left: 2px;
+      animation: blink 1s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ---------- 鼠标跟随光晕 ---------- */
+    .cursor-glow {
+      position: fixed; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, var(--glow-violet) 0%, transparent 65%);
+      pointer-events: none; z-index: 0; transform: translate(-50%, -50%);
+      transition: opacity .4s; opacity: 0;
     }
 
-    /* 项目 */
-    .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-    .project {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 20px; display: flex; flex-direction: column;
-      transition: transform .2s, border-color .2s;
+    /* ---------- Bento Grid(About)---------- */
+    .bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+    .bento .card { padding: 24px; }
+    .b-4 { grid-column: span 4; } .b-6 { grid-column: span 6; } .b-8 { grid-column: span 8; } .b-12 { grid-column: span 12; }
+    .card-label {
+      font-family: var(--font-mono); font-size: 11.5px; color: var(--text-faint);
+      text-transform: uppercase; letter-spacing: .12em; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .project:hover { transform: translateY(-4px); border-color: var(--accent); }
-    .project h3 { font-size: 18px; margin-bottom: 8px; }
-    .project .desc { color: var(--muted); font-size: 14px; flex: 1; }
-    .project .tags { margin-top: 12px; }
-    .project .tag { font-size: 12px; padding: 3px 10px; }
-    .project .links { margin-top: 14px; font-size: 14px; }
-    .project .links a { margin-right: 14px; }
+    .card-label::before { content: "//"; color: var(--violet); }
 
-    /* 经历时间线 */
-    .timeline { border-left: 2px solid var(--border); padding-left: 24px; }
-    .timeline .item { position: relative; margin-bottom: 24px; }
-    .timeline .item::before {
-      content: ""; position: absolute; left: -31px; top: 8px;
-      width: 10px; height: 10px; border-radius: 50%;
-      background: var(--accent);
+    .json-card { font-family: var(--font-mono); font-size: 13.5px; line-height: 2; white-space: pre-wrap; }
+    .jk { color: var(--syn-keyword); } .js { color: var(--syn-string); }
+    .jf { color: var(--syn-func); } .jc { color: var(--syn-comment); }
+    .jn { color: var(--syn-number); }
+
+    .chip {
+      font-family: var(--font-mono); font-size: 12.5px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--bg-inset); border: 1px solid var(--border);
+      border-radius: 999px; padding: 4px 13px; margin: 4px 4px 0 0;
+      transition: border-color .2s, color .2s;
     }
-    .timeline .item .time { color: var(--accent); font-size: 13px; }
-    .timeline .item h3 { font-size: 16px; }
-    .timeline .item p { color: var(--muted); font-size: 14px; }
+    .chip:hover { border-color: var(--cyan); color: var(--cyan); }
 
-    footer { border-top: 1px solid var(--border); padding: 24px 0; text-align: center; color: var(--muted); font-size: 14px; }
+    .status-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--lime); margin-right: 8px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(163, 230, 53, .15); } }
 
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 26px; }
-      nav .links a { margin-left: 12px; font-size: 13px; }
+    .fact-list { list-style: none; }
+    .fact-list li {
+      font-size: 14px; color: var(--text-muted); padding: 6px 0;
+      display: flex; gap: 10px;
+    }
+    .fact-list li::before { content: "▸"; color: var(--violet); font-family: var(--font-mono); }
+
+    /* ---------- Skills:package.json 依赖块 ---------- */
+    .pkg { font-family: var(--font-mono); font-size: 14px; }
+    .pkg-deps { margin-bottom: 34px; }
+    .pkg-deps .pkg-head {
+      font-size: 15px; margin-bottom: 12px;
+    }
+    .dep-row {
+      display: flex; flex-wrap: wrap; gap: 10px; padding: 8px 0 8px 26px;
+      border-left: 1px dashed var(--border-strong); margin-left: 8px;
+    }
+    .dep {
+      background: var(--bg-inset); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px; cursor: default;
+      transition: transform .2s, border-color .2s; position: relative;
+    }
+    .dep:hover { transform: translateY(-3px); border-color: var(--violet); }
+    .dep .name { color: var(--syn-func); font-weight: 500; }
+    .dep .ver { color: var(--text-faint); font-size: 12px; margin-left: 6px; }
+    .dep .tip {
+      position: absolute; bottom: calc(100% + 8px); left: 0; z-index: 5;
+      width: max-content; max-width: 260px;
+      background: var(--bg-panel); border: 1px solid var(--border-strong);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 12.5px; line-height: 1.7; color: var(--text-muted);
+      opacity: 0; transform: translateY(6px); pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    }
+    .dep:hover .tip { opacity: 1; transform: none; }
+    .dep .tip .lvl { color: var(--syn-string); font-weight: 700; }
+
+    /* ---------- 经历:Git commit 时间轴 ---------- */
+    .git-log { position: relative; padding-left: 34px; }
+    .git-log::before {
+      content: ""; position: absolute; left: 10px; top: 6px; bottom: 6px;
+      width: 2px; background: linear-gradient(var(--violet), var(--cyan));
+      transform: scaleY(0); transform-origin: top;
+      transition: transform 1.2s ease .2s;
+    }
+    .git-log.drawn::before { transform: scaleY(1); }
+    .commit { position: relative; padding-bottom: 36px; }
+    .commit:last-child { padding-bottom: 0; }
+    .commit::before {
+      content: ""; position: absolute; left: -30px; top: 7px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--bg); border: 2.5px solid var(--violet);
+      box-shadow: 0 0 10px var(--glow-violet);
+    }
+    .commit:first-child::before { background: var(--violet); }
+    .commit .hash { font-family: var(--font-mono); font-size: 12px; color: var(--amber); }
+    .commit .badge {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      border-radius: 5px; padding: 1px 8px; margin-left: 10px;
+    }
+    .badge-feat { background: rgba(124,58,237,.16); color: var(--syn-keyword); }
+    .badge-fix { background: rgba(244,114,182,.14); color: var(--pink); }
+    .badge-refactor { background: rgba(34,211,238,.14); color: var(--cyan); }
+    .badge-merge { background: rgba(163,230,53,.14); color: var(--lime); }
+    .badge-docs { background: rgba(251,191,36,.14); color: var(--amber); }
+    .commit h3 {
+      font-family: var(--font-display); font-size: 18px; margin: 4px 0 2px;
+    }
+    .commit .time { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+    .commit p { color: var(--text-muted); font-size: 14.5px; margin-top: 4px; }
+
+    /* ---------- Projects:repo card ---------- */
+    .repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .repo { overflow: hidden; display: flex; flex-direction: column; }
+    .lang-bar { display: flex; height: 3px; }
+    .lang-bar span { flex: 1; }
+    .repo-body { padding: 22px 22px 18px; display: flex; flex-direction: column; flex: 1; }
+    .repo h3 {
+      font-family: var(--font-display); font-size: 19px; display: flex; align-items: center; gap: 8px;
+    }
+    .repo h3 svg { color: var(--text-faint); flex-shrink: 0; }
+    .repo .desc { color: var(--text-muted); font-size: 14px; margin: 10px 0 14px; flex: 1; }
+    .repo-meta {
+      font-family: var(--font-mono); font-size: 12.5px; color: var(--text-faint);
+      display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 12px;
+    }
+    .repo-meta .l { display: inline-flex; align-items: center; gap: 6px; }
+    .lang-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .repo .chips { margin-bottom: 14px; }
+    .repo .chips .chip { font-size: 11.5px; padding: 2px 10px; }
+    .repo-links { display: flex; gap: 18px; font-family: var(--font-mono); font-size: 13px; }
+    .repo-links a { color: var(--cyan); transition: color .2s; }
+    .repo-links a:hover { color: var(--violet); }
+
+    /* ---------- Contact:POST /contact ---------- */
+    .contact-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+    .big-mail {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(24px, 3.6vw, 40px); letter-spacing: -.02em;
+      word-break: break-all; transition: color .2s;
+    }
+    .big-mail:hover { color: var(--cyan); }
+    .socials { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 12px; }
+    .social-btn {
+      font-family: var(--font-mono); font-size: 13px;
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 9px 18px; color: var(--text-muted);
+      transition: all .2s;
+    }
+    .social-btn:hover { border-color: var(--violet); color: var(--text); transform: translateY(-2px); }
+    .req-card { font-family: var(--font-mono); padding: 24px; }
+    .req-label {
+      font-size: 12px; color: var(--syn-comment); margin-bottom: 16px;
+    }
+    .req-label .m { color: var(--lime); font-weight: 700; }
+    .req-label .u { color: var(--cyan); }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; color: var(--syn-keyword); margin-bottom: 5px; }
+    .field input, .field textarea {
+      width: 100%; font-family: var(--font-mono); font-size: 13.5px;
+      background: var(--bg-inset); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; outline: none; transition: border-color .2s;
+      resize: vertical;
+    }
+    .field input:focus, .field textarea:focus { border-color: var(--violet); }
+    .post-btn {
+      width: 100%; font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      color: #fff; border: none; border-radius: 8px; padding: 12px;
+      cursor: pointer; transition: transform .2s, box-shadow .2s;
+    }
+    .post-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--glow-violet); }
+    .resp {
+      margin-top: 14px; font-size: 13px; line-height: 1.9; white-space: pre-wrap;
+      display: none;
+    }
+    .resp.ok { display: block; color: var(--lime); }
+    .resp.err { display: block; color: var(--pink); }
+
+    /* ---------- 底部状态栏 ---------- */
+    .statusbar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      background: var(--bg-panel-glass); backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono); font-size: 11.5px; color: var(--text-faint);
+    }
+    .statusbar .inner {
+      max-width: 1160px; margin: 0 auto; padding: 0 24px;
+      height: 30px; display: flex; align-items: center; gap: 22px;
+    }
+    .statusbar .branch { color: var(--lime); }
+    .statusbar .ok { color: var(--cyan); }
+    .statusbar .right { margin-left: auto; display: flex; gap: 22px; }
+
+    /* ---------- 彩蛋 ---------- */
+    .easter {
+      position: fixed; inset: 0; z-index: 100; display: none;
+      align-items: center; justify-content: center;
+      background: rgba(5,5,10,.8); backdrop-filter: blur(6px);
+    }
+    .easter.show { display: flex; }
+    .easter .box {
+      max-width: 520px; width: 90%; padding: 34px;
+      font-family: var(--font-mono); font-size: 14px; line-height: 2.1;
+    }
+    .easter .close-hint { color: var(--text-faint); font-size: 12px; text-align: center; margin-top: 18px; }
+
+    /* ---------- footer ---------- */
+    .site-footer { padding: 48px 0 70px; text-align: center; }
+    .site-footer p { font-family: var(--font-mono); font-size: 13px; color: var(--text-faint); }
+    .site-footer .heart { color: var(--pink); }
+
+    /* ---------- 移动端 ---------- */
+    .hamburger { display: none; }
+    @media (max-width: 860px) {
+      .menubar .menu-item { display: none; }
+      .tabs { padding: 0 16px; }
+      section { padding: 64px 0 24px; }
+      .b-4, .b-6, .b-8 { grid-column: span 12; }
+      .contact-wrap { grid-template-columns: 1fr; }
+      .repo-grid { grid-template-columns: 1fr; }
+      .cursor-glow { display: none; }
+      .hero-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
     }
   </style>
 </head>
 <body>
+  <!-- 背景层 -->
+  <div class="bg-layer bg-grid" aria-hidden="true"></div>
+  <div class="bg-layer" aria-hidden="true">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+  </div>
+  <svg class="bg-layer bg-noise" aria-hidden="true">
+    <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2"/></filter>
+    <rect width="100%" height="100%" filter="url(#noise)"/>
+  </svg>
+  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
 
-  <nav>
-    <div class="container">
-      <span class="logo" id="nav-name">个人主页</span>
-      <div class="links">
-        <a href="#about">关于我</a>
-        <a href="#skills">技能</a>
-        <a href="#projects">项目</a>
-        <a href="#experience">经历</a>
-      </div>
+  <!-- 顶部 IDE 导航 -->
+  <nav class="ide-nav" aria-label="主导航">
+    <div class="menubar">
+      <span class="logo"><span class="dot"></span><span id="logo-name">~/portfolio</span></span>
+      <span class="menu-item">File</span>
+      <span class="menu-item">Edit</span>
+      <span class="menu-item">View</span>
+      <span class="menu-item">Help</span>
+      <span class="spacer"></span>
+      <button class="theme-toggle" id="theme-toggle" title="切换编辑器主题">☾ dark+</button>
+    </div>
+    <div class="tabs" role="navigation">
+      <a class="tab active" href="#about" data-target="about">about<span class="ext">.md</span></a>
+      <a class="tab" href="#skills" data-target="skills">skills<span class="ext">.json</span></a>
+      <a class="tab" href="#experience" data-target="experience">experience<span class="ext">.log</span></a>
+      <a class="tab" href="#projects" data-target="projects">projects<span class="ext">/</span></a>
+      <a class="tab" href="#contact" data-target="contact">contact<span class="ext">.sh</span></a>
+      <button class="run-btn" id="nav-cta" onclick="location.href='#contact'">▶ Run</button>
     </div>
   </nav>
 
-  <header class="hero">
-    <div class="container">
-      <div class="avatar" id="hero-avatar">?</div>
-      <h1 id="hero-name">你的名字</h1>
-      <p class="tagline" id="hero-tagline"></p>
-      <p class="school" id="hero-school"></p>
-      <div class="contact" id="hero-contact"></div>
-    </div>
-  </header>
+  <main>
+    <!-- ============ Hero:非对称布局,左终端右视觉 ============ -->
+    <header class="container" id="hero">
+      <div class="hero-grid" style="display:grid; grid-template-columns: 1.15fr .85fr; gap:56px; align-items:center; min-height: calc(88vh - 96px); padding: 40px 0 60px;">
+        <div>
+          <p style="font-family:var(--font-mono); font-size:13.5px; color:var(--text-faint); margin-bottom:14px;">
+            <span style="color:var(--lime);">●</span> <span id="hero-hello">你好,世界</span>
+          </p>
+          <h1 style="font-family:var(--font-display); font-size:clamp(40px,6.5vw,72px); font-weight:700; letter-spacing:-.03em; line-height:1.08; margin-bottom:20px;">
+            <span id="hero-name" class="grad-text">你的名字</span>
+          </h1>
+          <p id="hero-tagline" style="font-size:18px; color:var(--text-muted); max-width:52ch; margin-bottom:34px;"></p>
+          <div class="term reveal" style="text-align:left;">
+            <div class="term-bar">
+              <span class="b b-r"></span><span class="b b-y"></span><span class="b b-g"></span>
+              <span class="title">whoami — zsh — 80×24</span>
+            </div>
+            <div class="term-body" id="term-body" aria-live="polite"></div>
+          </div>
+          <div style="display:flex; gap:14px; margin-top:30px; flex-wrap:wrap;">
+            <button class="post-btn" style="width:auto; padding:12px 28px;" onclick="location.href='#projects'">查看项目 →</button>
+            <button class="theme-toggle" style="padding:12px 24px;" onclick="location.href='#contact'">联系我</button>
+          </div>
+        </div>
+        <div id="hero-visual" style="position:relative; display:flex; align-items:center; justify-content:center;"></div>
+      </div>
+      <p style="font-family:var(--font-mono); font-size:12px; color:var(--text-faint); text-align:center; padding-bottom:8px;">
+        <span style="animation:blink 1.2s steps(1) infinite;">$</span> tail -f ./motivation.log <span style="animation:blink 1s steps(1) infinite; color:var(--lime);">▊</span>
+      </p>
+    </header>
 
-  <section id="about">
-    <div class="container">
-      <h2>关于我</h2>
-      <p class="about-text" id="about-text"></p>
-    </div>
-  </section>
+    <!-- ============ About:Bento Grid ============ -->
+    <section id="about" class="container">
+      <div class="section-head reveal">
+        <span class="idx">01</span>
+        <h2>关于我</h2>
+        <span class="file">~/about.md</span>
+      </div>
+      <div class="bento">
+        <div class="card b-8 reveal json-card" id="about-json" aria-label="个人简介 JSON"></div>
+        <div class="card b-4 reveal">
+          <div class="card-label">current_status</div>
+          <p style="font-size:15px;"><span class="status-dot"></span><span id="about-status" style="color:var(--text-muted);"></span></p>
+        </div>
+        <div class="card b-6 reveal">
+          <div class="card-label">stack_keywords</div>
+          <div id="about-chips"></div>
+        </div>
+        <div class="card b-6 reveal">
+          <div class="card-label">fun_facts</div>
+          <ul class="fact-list" id="about-facts"></ul>
+        </div>
+      </div>
+    </section>
 
-  <section id="skills">
-    <div class="container">
-      <h2>技能</h2>
-      <div id="skill-list"></div>
-    </div>
-  </section>
+    <!-- ============ Skills:package.json 依赖块 ============ -->
+    <section id="skills" class="container">
+      <div class="section-head reveal">
+        <span class="idx">02</span>
+        <h2>技能</h2>
+        <span class="file">~/skills.json</span>
+      </div>
+      <div class="card reveal" style="padding: 30px 34px;">
+        <div class="pkg" id="pkg-body"></div>
+      </div>
+    </section>
 
-  <section id="projects">
-    <div class="container">
-      <h2>项目经历</h2>
-      <div class="project-grid" id="project-list"></div>
-    </div>
-  </section>
+    <!-- ============ Experience:Git commit 时间轴 ============ -->
+    <section id="experience" class="container">
+      <div class="section-head reveal">
+        <span class="idx">03</span>
+        <h2>教育与经历</h2>
+        <span class="file">~/experience.log</span>
+      </div>
+      <div class="git-log reveal" id="git-log"></div>
+    </section>
 
-  <section id="experience">
-    <div class="container">
-      <h2>教育与经历</h2>
-      <div class="timeline" id="experience-list"></div>
-    </div>
-  </section>
+    <!-- ============ Projects:repo cards ============ -->
+    <section id="projects" class="container">
+      <div class="section-head reveal">
+        <span class="idx">04</span>
+        <h2>项目经历</h2>
+        <span class="file">~/projects/</span>
+      </div>
+      <div class="repo-grid" id="repo-grid"></div>
+    </section>
 
-  <footer>
-    <div class="container" id="footer-text"></div>
-  </footer>
+    <!-- ============ Contact:POST /contact ============ -->
+    <section id="contact" class="container">
+      <div class="section-head reveal">
+        <span class="idx">05</span>
+        <h2>联系我</h2>
+        <span class="file">~/contact.sh</span>
+      </div>
+      <div class="contact-wrap">
+        <div class="reveal">
+          <p style="font-family:var(--font-mono); font-size:13px; color:var(--text-faint); margin-bottom:10px;">$ curl -X GET /email</p>
+          <a class="big-mail" id="big-mail" href="mailto:"></a>
+          <div class="socials" id="socials"></div>
+        </div>
+        <form class="card req-card reveal" id="contact-form" onsubmit="return false;" aria-label="联系表单">
+          <p class="req-label"><span class="m">POST</span> <span class="u">/api/v1/contact</span> · Content-Type: application/json</p>
+          <div class="field">
+            <label for="f-name">"name":</label>
+            <input id="f-name" type="text" placeholder="你的称呼" required>
+          </div>
+          <div class="field">
+            <label for="f-email">"email":</label>
+            <input id="f-email" type="email" placeholder="you@example.com" required>
+          </div>
+          <div class="field">
+            <label for="f-msg">"message":</label>
+            <textarea id="f-msg" rows="4" placeholder="想说的话…" required></textarea>
+          </div>
+          <button class="post-btn" type="submit">POST /contact →</button>
+          <div class="resp" id="resp" role="status"></div>
+        </form>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p id="footer-text">build with <span class="heart">❤</span> and code · © <span id="footer-year"></span></p>
+    </footer>
+  </main>
+
+  <!-- ============ 底部状态栏 ============ -->
+  <div class="statusbar" role="contentinfo">
+    <div class="inner">
+      <span class="branch">⑂ main*</span>
+      <span class="ok">✓ build passing</span>
+      <span id="sb-errors">0 errors</span>
+      <div class="right">
+        <span id="sb-ln">Ln 1, Col 1</span>
+        <span>UTF-8</span>
+        <span id="sb-theme">Dark+</span>
+        <span>v<span id="sb-version">1.0.0</span></span>
+        <span id="sb-time"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 彩蛋 ============ -->
+  <div class="easter" id="easter" aria-hidden="true">
+    <div class="card box">
+      <p><span class="jk">const</span> <span class="jf">secret</span> = <span class="js">"🎉 你发现了彩蛋!"</span>;</p>
+      <p class="out" style="color:var(--text-muted);">恭喜!你已解锁隐藏成就:<span style="color:var(--lime);">Konami Master</span></p>
+      <p style="color:var(--text-muted);" id="easter-extra"></p>
+      <p class="close-hint">按 Esc 或点击任意处关闭</p>
+    </div>
+  </div>
 
   <script src="data.js"></script>
   <script>
-    (function () {
-      const d = window.SITE_DATA;
+  (function () {
+    "use strict";
+    const d = window.SITE_DATA;
+    const $ = (id) => document.getElementById(id);
 
-      // Hero
-      document.title = d.name + " - 个人主页";
-      document.getElementById("nav-name").textContent = d.name;
-      document.getElementById("hero-name").textContent = d.name;
-      document.getElementById("hero-avatar").textContent = d.avatarText || d.name.charAt(0);
-      document.getElementById("hero-tagline").textContent = d.tagline || "";
-      document.getElementById("hero-school").textContent = d.school || "";
-      document.getElementById("hero-contact").innerHTML = (d.contacts || [])
-        .map(c => "<span>" + esc(c.label || c.text) + ": " + linkify(c.text) + "</span>").join("");
+    // ---------- 转义工具 ----------
+    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g,
+      (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
 
-      // 关于我
-      document.getElementById("about-text").textContent = d.about || "";
+    // ============ Hero 基础信息 ============
+    document.title = d.name + " — 个人主页";
+    $("logo-name").textContent = "~/" + (d.logoText || "portfolio");
+    $("hero-name").textContent = d.name;
+    $("hero-tagline").textContent = d.tagline || "";
+    $("hero-hello").textContent = d.heroHello || "你好,世界";
+    document.querySelector(".term-bar .title").textContent = "whoami — zsh — 80×24";
 
-      // 技能
-      document.getElementById("skill-list").innerHTML = (d.skills || [])
-        .map(g => '<div class="skill-group"><h3>' + esc(g.name) + '</h3><div class="tags">'
-          + g.items.map(i => '<span class="tag">' + esc(i) + '</span>').join("") + '</div></div>').join("");
-
-      // 项目
-      document.getElementById("project-list").innerHTML = (d.projects || [])
-        .map(p => '<div class="project"><h3>' + esc(p.name) + '</h3>'
-          + '<p class="desc">' + esc(p.description || "") + '</p>'
-          + (p.tech && p.tech.length ? '<div class="tags">' + p.tech.map(t => '<span class="tag">' + esc(t) + '</span>').join("") + '</div>' : "")
-          + '<div class="links">' + (p.links || []).map(l => '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.label) + '</a>').join("") + '</div></div>').join("");
-
-      // 经历
-      document.getElementById("experience-list").innerHTML = (d.experience || [])
-        .map(e => '<div class="item"><div class="time">' + esc(e.time) + '</div><h3>' + esc(e.title)
-          + '</h3><p>' + esc(e.description || "") + '</p></div>').join("");
-
-      // Footer
-      document.getElementById("footer-text").innerHTML = d.footer || ("© " + new Date().getFullYear() + " " + esc(d.name));
-
-      function esc(s) {
-        return String(s == null ? "" : s).replace(/[&<>"']/g, m =>
-          ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    // ============ Hero 右侧视觉:抽象节点图(Canvas 神经网络) ============
+    (function heroVisual() {
+      const host = $("hero-visual");
+      const canvas = document.createElement("canvas");
+      canvas.width = 480; canvas.height = 480;
+      canvas.style.maxWidth = "100%";
+      canvas.setAttribute("aria-hidden", "true");
+      host.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+      const N = 26;
+      const nodes = Array.from({ length: N }, () => ({
+        x: Math.random() * 480, y: Math.random() * 480,
+        vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
+        r: 1.5 + Math.random() * 2.5,
+        hue: [185, 262, 82][Math.floor(Math.random() * 3)]
+      }));
+      let raf, visible = true;
+      function frame() {
+        if (!visible) return;
+        ctx.clearRect(0, 0, 480, 480);
+        for (const n of nodes) {
+          n.x += n.vx; n.y += n.vy;
+          if (n.x < 0 || n.x > 480) n.vx *= -1;
+          if (n.y < 0 || n.y > 480) n.vy *= -1;
+        }
+        for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+          const a = nodes[i], b = nodes[j];
+          const dist = Math.hypot(a.x - b.x, a.y - b.y);
+          if (dist < 130) {
+            ctx.strokeStyle = "rgba(124,58,237," + (0.14 * (1 - dist / 130)).toFixed(3) + ")";
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+        for (const n of nodes) {
+          ctx.fillStyle = "hsl(" + n.hue + ",80%,65%)";
+          ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill();
+        }
+        raf = requestAnimationFrame(frame);
       }
-      function linkify(text) {
-        const s = esc(text);
-        return /^https?:\/\//.test(text) ? '<a href="' + s + '" target="_blank" rel="noopener">' + s + '</a>' : s;
+      // 页面不可见时暂停,尊重 60fps 且省电
+      document.addEventListener("visibilitychange", () => {
+        visible = !document.hidden;
+        if (visible) frame(); else cancelAnimationFrame(raf);
+      });
+      const io = new IntersectionObserver(([e]) => {
+        visible = e.isIntersecting && !document.hidden;
+        if (visible) frame(); else cancelAnimationFrame(raf);
+      });
+      io.observe(canvas);
+      frame();
+    })();
+
+    // ============ 终端打字机 ============
+    (function typewriter() {
+      const body = $("term-body");
+      const seq = (d.terminal && d.terminal.length ? d.terminal : [
+        { type: "cmd", text: "whoami" },
+        { type: "out", text: d.name + " · " + (d.school || "") },
+        { type: "out", text: d.tagline || "" },
+        { type: "cmd", text: "cat ./contact.txt" },
+        { type: "out", html: '<span class="hl-c">' + esc((d.contacts && d.contacts[0] && d.contacts[0].text) || "") + "</span>" },
+      ]);
+      let li = 0, ci = 0, lineEl = null;
+      function nextLine() {
+        if (li >= seq.length) {
+          const c = document.createElement("span");
+          c.className = "caret";
+          body.appendChild(c);
+          return;
+        }
+        const item = seq[li];
+        lineEl = document.createElement("div");
+        lineEl.className = "term-line";
+        if (item.type === "cmd") {
+          lineEl.innerHTML = '<span class="prompt">$ </span><span class="cmd"></span><span class="caret"></span>';
+        } else {
+          lineEl.innerHTML = item.html ? item.html : '<span class="out"></span>';
+        }
+        body.appendChild(lineEl);
+        ci = 0;
+        type();
+      }
+      function type() {
+        const item = seq[li];
+        if (item.type === "cmd") {
+          const target = lineEl.querySelector(".cmd");
+          ci++;
+          target.textContent = item.text.slice(0, ci);
+          if (ci < item.text.length) { setTimeout(type, 65 + Math.random() * 60); return; }
+        }
+        li++;
+        const c = lineEl.querySelector(".caret");
+        if (c) c.remove();
+        setTimeout(nextLine, item.type === "cmd" ? 350 : 180);
+      }
+      nextLine();
+    })();
+
+    // ============ About:Bento 渲染 ============
+    (function about() {
+      const a = d.about || {};
+      // JSON 卡片
+      const jsonLines = [
+        '<span class="jc">// about.md — 自动生成于 ' + new Date().getFullYear() + '</span>',
+        '<span class="jk">const</span> <span class="jf">me</span> = {',
+        '  <span class="jk">name</span>: <span class="js">"' + esc(a.name || d.name) + '"</span>,',
+        '  <span class="jk">school</span>: <span class="js">"' + esc(a.school || d.school || "") + '"</span>,',
+        '  <span class="jk">major</span>: <span class="js">"' + esc(a.major || "") + '"</span>,',
+        '  <span class="jk">role</span>: <span class="js">"' + esc(a.role || "") + '"</span>,',
+        '  <span class="jk">bio</span>: [',
+        (a.bioLines || []).map((l) => '    <span class="js">"' + esc(l) + '"</span>').join(",\n") + ",",
+        '  ],',
+        '  <span class="jk">openToWork</span>: <span class="jn">' + (a.openToWork !== false) + "</span>,",
+        "};",
+      ];
+      $("about-json").innerHTML = jsonLines.join("\n");
+      $("about-status").textContent = a.status || "";
+      $("about-chips").innerHTML = (a.keywords || [])
+        .map((k) => '<span class="chip"># ' + esc(k) + "</span>").join("");
+      $("about-facts").innerHTML = (a.facts || [])
+        .map((f) => "<li>" + esc(f) + "</li>").join("");
+    })();
+
+    // ============ Skills:package.json ============
+    (function skills() {
+      const groups = d.skillGroups || [];
+      const fmt = (k) => '<span class="jk">"' + esc(k) + '"</span>:';
+      $("pkg-body").innerHTML = groups.map((g) =>
+        '<div class="pkg-deps">' +
+        '<div class="pkg-head">' + fmt(g.key) + " {" + "</div>" +
+        '<div class="dep-row">' +
+        g.items.map((it) =>
+          '<div class="dep" tabindex="0">' +
+          '<span class="name">"' + esc(it.name) + '"</span><span class="ver">' + esc(it.level || "") + "</span>" +
+          '<span class="tip">' + (it.tip ? esc(it.tip) + "<br>" : "") +
+          '<span class="lvl">proficiency: ' + esc(it.level || "—") + "</span></span>" +
+          "</div>").join("") +
+        "</div><div>}</div></div>"
+      ).join("");
+    })();
+
+    // ============ Experience:git log ============
+    (function experience() {
+      const items = d.experience || [];
+      const badgeClass = { feat: "badge-feat", fix: "badge-fix", refactor: "badge-refactor", merge: "badge-merge", docs: "badge-docs" };
+      $("git-log").innerHTML = items.map((e) =>
+        '<div class="commit">' +
+        '<div><span class="hash">commit ' + esc(e.hash || "f4262e7") + '</span>' +
+        '<span class="badge ' + (badgeClass[e.tag] || "badge-feat") + '">' + esc(e.tag || "feat") + "</span></div>" +
+        "<h3>" + esc(e.title) + "</h3>" +
+        '<div class="time">' + esc(e.time || "") + "</div>" +
+        (e.description ? "<p>" + esc(e.description) + "</p>" : "") +
+        "</div>"
+      ).join("");
+    })();
+
+    // ============ Projects:repo cards ============
+    (function projects() {
+      const LANG_COLORS = {
+        "JavaScript": "#f1e05a", "TypeScript": "#3178c6", "Python": "#3572A5",
+        "Java": "#b07219", "C": "#555555", "C++": "#f34b7d", "C#": "#178600",
+        "HTML": "#e34c26", "CSS": "#563d7c", "Vue": "#41b883", "Go": "#00ADD8",
+        "Rust": "#dea584", "Shell": "#89e051", "Kotlin": "#A97BFF", "Swift": "#F05138",
+      };
+      const starSvg = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25z"/></svg>';
+      const forkSvg = '<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/></svg>';
+      const bookSvg = '<svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg>';
+      $("repo-grid").innerHTML = (d.projects || []).map((p) => {
+        const langs = p.languages || [];
+        const colors = langs.map((l) => LANG_COLORS[l] || "#8b8b9e");
+        const main = langs[0] || "";
+        return '<article class="card repo reveal tilt">' +
+          '<div class="lang-bar">' + colors.map((c) => '<span style="background:' + c + '"></span>').join("") + "</div>" +
+          '<div class="repo-body">' +
+          "<h3>" + bookSvg + esc(p.name) + "</h3>" +
+          '<p class="desc">' + esc(p.description || "") + "</p>" +
+          '<div class="repo-meta">' +
+          (main ? '<span class="l"><span class="lang-dot" style="background:' + (LANG_COLORS[main] || "#8b8b9e") + '"></span>' + esc(main) + "</span>" : "") +
+          '<span class="l">' + starSvg + esc(p.stars || "0") + "</span>" +
+          '<span class="l">' + forkSvg + esc(p.forks || "0") + "</span>" +
+          "</div>" +
+          '<div class="chips">' + (p.tech || []).map((t) => '<span class="chip">' + esc(t) + "</span>").join("") + "</div>" +
+          '<div class="repo-links">' +
+          (p.links || []).map((l) => '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">' + esc(l.label) + " ↗</a>").join("") +
+          "</div></div></article>";
+      }).join("");
+    })();
+
+    // ============ Contact ============
+    (function contact() {
+      const mail = (d.contacts || []).find((c) => /@/.test(c.text)) || {};
+      $("big-mail").textContent = mail.text || "";
+      $("big-mail").href = "mailto:" + (mail.text || "");
+      $("socials").innerHTML = (d.contacts || [])
+        .filter((c) => /^https?:\/\//.test(c.text))
+        .map((c) => '<a class="social-btn" href="' + esc(c.text) + '" target="_blank" rel="noopener">' + esc(c.label || c.text) + " ↗</a>")
+        .join("");
+
+      $("contact-form").addEventListener("submit", () => {
+        const name = $("f-name").value.trim();
+        const email = $("f-email").value.trim();
+        const msg = $("f-msg").value.trim();
+        const resp = $("resp");
+        if (!name || !email || !msg) {
+          resp.className = "resp err";
+          resp.textContent = "HTTP 400 Bad Request\n{ \"error\": \"所有字段均必填\" }";
+          return;
+        }
+        resp.className = "resp ok";
+        resp.textContent = "HTTP/1.1 201 Created\n{ \"message\": \"收到!我会尽快回复 " + name + " ~\" }";
+        $("contact-form").reset();
+      });
+    })();
+
+    // ============ Footer / 状态栏 ============
+    $("footer-year").textContent = new Date().getFullYear();
+    $("footer-text").innerHTML = (d.footer || "build with") + " <span class='heart'>❤</span> and code · © " + new Date().getFullYear() + " " + esc(d.name);
+    $("sb-version").textContent = d.version || "1.0.0";
+    setInterval(() => {
+      $("sb-time").textContent = new Date().toLocaleTimeString("zh-CN", { hour12: false });
+    }, 1000);
+
+    // ============ 主题切换(IDE Dark+ / Light+) ============
+    (function theme() {
+      const btn = $("theme-toggle");
+      const apply = (light) => {
+        document.documentElement.classList.toggle("light", light);
+        btn.textContent = light ? "☀ light+" : "☾ dark+";
+        $("sb-theme").textContent = light ? "Light+" : "Dark+";
+      };
+      apply(localStorage.getItem("ide-theme") === "light");
+      btn.addEventListener("click", () => {
+        const light = !document.documentElement.classList.contains("light");
+        apply(light);
+        localStorage.setItem("ide-theme", light ? "light" : "dark");
+      });
+    })();
+
+    // ============ Tab 高亮 + 平滑锚点 ============
+    (function tabs() {
+      const tabsArr = Array.from(document.querySelectorAll(".tab"));
+      const sections = tabsArr.map((t) => $(t.dataset.target)).filter(Boolean);
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          tabsArr.forEach((t) => t.classList.toggle("active", t.dataset.target === en.target.id));
+        });
+      }, { rootMargin: "-35% 0px -55% 0px" });
+      sections.forEach((s) => io.observe(s));
+    })();
+
+    // ============ 滚动渐入 ============
+    (function reveal() {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      // git 分支线生长
+      const log = $("git-log");
+      const io2 = new IntersectionObserver(([en]) => {
+        if (en.isIntersecting) { log.classList.add("drawn"); io2.disconnect(); }
+      }, { threshold: 0.25 });
+      io2.observe(log);
+    })();
+
+    // ============ 鼠标跟随光晕 ============
+    (function glow() {
+      const g = $("cursor-glow");
+      let x = 0, y = 0, tx = 0, ty = 0, raf = null;
+      window.addEventListener("mousemove", (e) => {
+        tx = e.clientX; ty = e.clientY; g.style.opacity = "1";
+        if (!raf) loop();
+      });
+      function loop() {
+        x += (tx - x) * 0.08; y += (ty - y) * 0.08;
+        g.style.left = x + "px"; g.style.top = y + "px";
+        raf = Math.abs(tx - x) > .5 || Math.abs(ty - y) > .5 ? requestAnimationFrame(loop) : null;
       }
     })();
+
+    // ============ 卡片 3D tilt ============
+    (function tilt() {
+      if (window.matchMedia("(hover: none)").matches) return;
+      document.querySelectorAll(".tilt, .term").forEach((el) => {
+        el.addEventListener("mousemove", (e) => {
+          const r = el.getBoundingClientRect();
+          const rx = ((e.clientY - r.top) / r.height - .5) * -5;
+          const ry = ((e.clientX - r.left) / r.width - .5) * 5;
+          el.style.transform = "perspective(900px) rotateX(" + rx + "deg) rotateY(" + ry + "deg)";
+        });
+        el.addEventListener("mouseleave", () => { el.style.transform = ""; });
+      });
+    })();
+
+    // ============ 彩蛋:Konami Code + sudo ============
+    (function easter() {
+      const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+      let ki = 0, typed = "";
+      const box = $("easter");
+      const show = (msg) => {
+        $("easter-extra").textContent = msg || "";
+        box.classList.add("show");
+      };
+      const hide = () => box.classList.remove("show");
+      box.addEventListener("click", hide);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") { hide(); return; }
+        if (e.key === KONAMI[ki]) {
+          ki++;
+          if (ki === KONAMI.length) { ki = 0; show("↑↑↓↓←→←→BA — 老玩家的暗号。"); }
+        } else { ki = (e.key === KONAMI[0]) ? 1 : 0; }
+        if (e.target.matches("input, textarea")) return;
+        typed = (typed + e.key).slice(-10).toLowerCase();
+        if (typed.endsWith("sudo")) show("$ sudo make me a sandwich 🥪");
+      });
+    })();
+
+    // ============ 状态栏 Ln/Col(跟随滚动位置,小趣味) ============
+    (function lnCol() {
+      window.addEventListener("scroll", () => {
+        const max = document.documentElement.scrollHeight - innerHeight;
+        const p = max > 0 ? window.scrollY / max : 0;
+        $("sb-ln").textContent = "Ln " + (1 + Math.round(p * 99)) + ", Col 1";
+      }, { passive: true });
+    })();
+  })();
   </script>
 </body>
 </html>
