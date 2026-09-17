@@ -8,10 +8,10 @@
 
 ```
 Personal_Information/
-├── index.html      # 页面结构骨架(挂载点,一般不需要修改)
-├── css/style.css   # 样式与主题(配色、布局、动效;想改视觉风格才动它)
-├── js/main.js      # 交互逻辑(渲染数据、动效;想改行为才动它)
-├── data.js         # ⭐ 所有个人数据都在这里,日常只编辑这个文件
+├── index.html      # 页面结构骨架
+├── css/style.css   # 样式与主题
+├── js/main.js      # 交互逻辑
+├── data.js         # 个人数据
 └── README.md       # 本说明文件
 ```
 
